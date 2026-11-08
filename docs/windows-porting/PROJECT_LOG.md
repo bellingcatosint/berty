@@ -12,7 +12,12 @@ Investigate and, if technically viable, produce a usable Windows desktop build o
 
 This is an independent effort in the `bellingcatosint/berty` repository. It is not an official Berty upstream commitment or a claim of upstream support.
 
-## 2. Working rules
+## 2. Working channels
+
+- Project communication chat: https://t.me/expanse_org
+- The chat link was supplied by the project owner on 2026-11-08. The link could not be independently previewed during this update; its designation as the working chat is based on the owner's statement.
+
+## 3. Working rules
 
 1. Keep the default branch untouched during development. Work on a dedicated branch and propose changes through a pull request.
 2. Record each meaningful inspection, change, test, failure, and deviation in this log.
@@ -22,7 +27,7 @@ This is an independent effort in the `bellingcatosint/berty` repository. It is n
 6. If the plan changes, record what changed, why, and what evidence caused the change.
 7. Do not treat Berty as suitable for sensitive communications merely because a Windows build launches. Security suitability requires a separate, current assessment.
 
-## 3. Initial repository findings
+## 4. Initial repository findings
 
 The following are initial code/configuration observations. They are not yet proof that a Windows GUI build works.
 
@@ -34,7 +39,7 @@ The following are initial code/configuration observations. They are not yet proo
 - The release workflow includes a `windows-latest` runner in its build matrix. The exact toolchain and CGO prerequisites still need to be checked.
 - The mobile Expo/React Native project is not, by itself, a Windows desktop package.
 
-## 4. Objective and proposed delivery sequence
+## 5. Objective and proposed delivery sequence
 
 ### Phase 0 — Audit (current)
 
@@ -76,7 +81,7 @@ Test and record separately:
 - Consider an installer (for example MSI) only after the ZIP build and runtime tests are reliable.
 - Document installation, first launch, connection setup, troubleshooting, and removal.
 
-## 5. Current status
+## 6. Current status
 
 | Area | Status | Notes |
 |---|---|---|
@@ -89,7 +94,7 @@ Test and record separately:
 | Peer/message functionality | Not tested | No functionality claim |
 | Installer | Not started | Deferred until ZIP/runtime validation |
 
-## 6. Decision log
+## 7. Decision log
 
 ### 2026-11-08 — Initial direction
 
@@ -99,7 +104,7 @@ Test and record separately:
 
 **Confidence:** medium for the existence of a reusable GUI path; low for the effort and reliability of a Windows release until the audit and build tests are complete.
 
-## 7. Next actions
+## 8. Next actions
 
 1. Inspect the complete Windows release workflow, including compiler installation and CGO environment.
 2. Compare Windows and Linux GoReleaser configurations, including archive IDs and naming.
@@ -107,7 +112,7 @@ Test and record separately:
 4. Run or reproduce the proposed Windows build in CI.
 5. Update this log with exact commands, commit references, test evidence, and blockers.
 
-## 8. Audit notes — 2026-11-08
+## 9. Audit notes — 2026-11-08
 
 ### Verified from the checked-in configuration
 
@@ -129,7 +134,8 @@ The earlier suggestion that the Windows GUI could be enabled by adding only a Go
 - Whether the GUI can start and operate correctly on supported Windows versions.
 - Whether all runtime dependencies are present on a clean Windows machine.
 
-## 9. Change log
+## 10. Change log
 
 - 2026-11-08: Created the project log and dedicated documentation branch. No application source or release configuration changed.
 - 2026-11-08: Inspected the release workflow, Windows and Linux GoReleaser configurations, and GUI entry point. Recorded a material caveat: Windows CI currently marks GUI work as TODO and does not visibly provision a C compiler in the Windows job. No application source or release configuration changed.
+- 2026-11-08: Added the project owner's designated working chat, https://t.me/expanse_org. The link preview could not be independently fetched; no claim is made about its membership or access settings.
