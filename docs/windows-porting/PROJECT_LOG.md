@@ -107,6 +107,29 @@ Test and record separately:
 4. Run or reproduce the proposed Windows build in CI.
 5. Update this log with exact commands, commit references, test evidence, and blockers.
 
-## 8. Change log
+## 8. Audit notes — 2026-11-08
+
+### Verified from the checked-in configuration
+
+- The release matrix contains a `windows-latest` job, but the workflow also contains the comment `TODO: bertyguy`. The presence of a Windows runner therefore does not mean the GUI is already built there.
+- The Windows job installs Go with `actions/setup-go`, but the inspected Windows-specific steps do not install or configure a C compiler.
+- The Linux dependency step installs MinGW and Linux graphics/X11 development packages, but that step is conditional on `goos == linux` and does not run on the Windows job.
+- The Windows GoReleaser file currently has one generic archive and one build with ID `windows`.
+- The Linux GoReleaser file uses separate build IDs and separate archives for CLI (`berty`) and GUI (`bertygui`). A Windows GUI addition should follow the explicit artifact-separation pattern rather than simply appending a second build to the current generic archive.
+- The GUI source imports Fyne's app package and runs a native Fyne application. This makes the native Windows toolchain and CGO setup a first-order audit item.
+
+### Consequence / correction to the initial shortcut
+
+The earlier suggestion that the Windows GUI could be enabled by adding only a GoReleaser build stanza was incomplete. The workflow currently has an explicit GUI TODO and no visible Windows C-compiler setup. The shortest viable path may still be the existing Fyne GUI, but it requires a CI/toolchain audit before a safe patch can be specified.
+
+### Not yet verified
+
+- Whether the current pinned Go version and Fyne version build successfully on the Windows runner.
+- Which Windows C compiler/toolchain is compatible with this repository's Fyne dependencies and current build setup.
+- Whether the GUI can start and operate correctly on supported Windows versions.
+- Whether all runtime dependencies are present on a clean Windows machine.
+
+## 9. Change log
 
 - 2026-11-08: Created the project log and dedicated documentation branch. No application source or release configuration changed.
+- 2026-11-08: Inspected the release workflow, Windows and Linux GoReleaser configurations, and GUI entry point. Recorded a material caveat: Windows CI currently marks GUI work as TODO and does not visibly provision a C compiler in the Windows job. No application source or release configuration changed.
