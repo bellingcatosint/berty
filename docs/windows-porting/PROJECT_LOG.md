@@ -139,3 +139,46 @@ The earlier suggestion that the Windows GUI could be enabled by adding only a Go
 - 2026-11-08: Created the project log and dedicated documentation branch. No application source or release configuration changed.
 - 2026-11-08: Inspected the release workflow, Windows and Linux GoReleaser configurations, and GUI entry point. Recorded a material caveat: Windows CI currently marks GUI work as TODO and does not visibly provision a C compiler in the Windows job. No application source or release configuration changed.
 - 2026-11-08: Added the project owner's designated working chat, https://t.me/expanse_org. The link preview could not be independently fetched; no claim is made about its membership or access settings.
+
+## 11. Audit notes — 2026-11-09
+
+### Scope of this pass
+
+Read-only inspection of the checked-in Go module metadata, Windows and Linux GoReleaser configurations, release workflow, GUI entry point, and GUI package structure. No application source, release configuration, dependency version, or default-branch file was changed. No build command was executed in this pass.
+
+### Verified repository facts
+
+- The root `go.mod` declares Go `1.26.4`.
+- The same module directly requires `fyne.io/fyne/v2 v2.5.2`.
+- The module dependency list includes the native OpenGL/GLFW Go bindings `github.com/go-gl/gl` and `github.com/go-gl/glfw/v3.3/glfw`. Their presence, together with the Fyne application imports and `CGO_ENABLED=1` in the Windows GoReleaser build, makes the C toolchain and native graphics linkage a concrete build prerequisite to investigate. This is not yet proof of the exact compiler package or version required.
+- `go/cmd/berty/gui.go` is guarded by the `bertygui` build tag. It creates a Fyne application and exposes the experimental `berty gui` command.
+- `go/cmd/berty/gui/main.go` creates a window, initializes the messenger store and GUI context, displays the root widget, and waits for the window to close.
+- `go/cmd/berty/gui/app.go` assembles existing account, contact-request, contact-addition, multi-member, and conversation widgets. This confirms that the GUI code is more than an empty entry point; it does not verify that these functions work on Windows.
+- The Windows GoReleaser configuration currently defines one build ID, `windows`, with binary name `berty`, target `windows/amd64`, and `CGO_ENABLED=1`. It has no `bertygui` build or separate GUI archive.
+- The Linux GoReleaser configuration defines separate `berty` and `bertygui` builds and archives. The GUI build adds `-tags=bertygui`.
+- The release workflow's Windows matrix job installs Go, then invokes GoReleaser with the Windows configuration. The workflow does not contain an explicit Windows step that installs or configures a C compiler. The Linux-only dependency step installs MinGW and Linux graphics development packages; its condition excludes the Windows runner.
+- The release workflow is triggered for pull requests only when specified paths change. The current pull request changes only `docs/windows-porting/PROJECT_LOG.md`, which is outside its listed path filters. Therefore, the absence of a release workflow run for this documentation-only pull request is expected and must not be described as a failed build.
+
+### Interpretation — kept separate from verified facts
+
+- The existing Fyne GUI is a plausible reuse path, but the Windows build cannot be considered ready until the native toolchain and graphics linkage are demonstrated on the target runner.
+- The absence of an explicit compiler-installation step is a reproducibility gap in the checked-in workflow. It does not, by itself, prove that the hosted Windows image lacks a usable compiler.
+- The Linux packaging pattern is a useful reference for artifact separation, not proof that its configuration can be copied unchanged to Windows.
+- No evidence has yet been collected for Windows compilation, GUI startup, local-node lifecycle, peer connectivity, or message exchange.
+
+### Decision
+
+Do not modify the Windows release configuration yet. First identify and verify a compatible Windows C toolchain on the actual CI runner, then run a minimal tagged GUI build. Keep the existing CLI artifact unchanged. Only after the build succeeds should a separate Windows GUI build and archive be added.
+
+### Next verification actions
+
+1. Inspect the exact Fyne 2.5.2 Windows build requirements and the GLFW/OpenGL dependencies selected by the current module graph.
+2. Determine which C compiler is available on the hosted Windows runner by default, rather than assuming one is present or absent.
+3. Check whether the existing Windows CLI build depends on CGO in this repository and whether it currently succeeds on a relevant workflow run.
+4. Prepare a minimal, isolated CI experiment for `go build -tags=bertygui` targeting Windows amd64. Do not publish or release its output.
+5. Record the exact runner image, Go version, compiler identity/version, command, exit code, and complete relevant error output.
+6. If compilation succeeds, proceed to a separate GUI artifact definition; if it fails, record the first reproducible blocker before changing dependencies or architecture.
+
+### Change log
+
+- 2026-11-09: Completed a read-only audit of Go/Fyne versions, GUI source structure, native graphics bindings, and Windows/Linux packaging differences. Clarified why the documentation-only pull request did not trigger the release workflow. No application or release configuration changed; no Windows build was run.
